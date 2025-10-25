@@ -10,4 +10,10 @@ class Headers extends Component
     {
         return view('livewire.components.headers');
     }
+
+    public function logout()
+    {
+       
+        dd('Logout functionality not implemented yet.');
+    }
 }

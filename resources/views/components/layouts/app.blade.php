@@ -19,7 +19,14 @@
         <!-- Top Header -->
          <livewire:components.sidebars>
             @endif
-       
+    <!-- Spacer -->
+    <div class="d-block" role="separator" aria-hidden="true" style="height:var(--app-spacer,24px);"></div>
+
+    <style>
+    :root{--app-spacer:24px}
+    @media (min-width:768px){:root{--app-spacer:32px}}
+    @media (min-width:1200px){:root{--app-spacer:40px}}
+    </style>
        <div style="padding: 16px;">
          {{ $slot }}
        </div>
