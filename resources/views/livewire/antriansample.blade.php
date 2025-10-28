@@ -109,35 +109,62 @@
     <script type="text/javascript" src="myOnLibs.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <script>
-        // Inisialisasi EasySpeech
-        EasySpeech.init({ maxTimeout: 5000, interval: 250 })
-            .then(() => console.log('EasySpeech siap'))
-            .catch(e => console.error('Gagal inisialisasi EasySpeech', e));
+   const socket = io("http://localhost:3000");
 
-        // Fungsi untuk memanggil antrian manual
-        async function panggilAntrianManual() {
-            const input = document.getElementById('manualQueue').value.trim();
+socket.on("connect", () => {
+  console.log("✅ Terhubung ke server socket.io:", socket.id);
 
-            if (!input) {
-                alert('Silakan masukkan nomor antrian');
-                return;
-            }
+  // Join ke room counter ABC
+  socket.emit("joincounter", { nocounter: "ABC" });
+  console.log("📦 Joined room: ABC");
+});
 
-            // Tampilkan nomor di UI
-            document.getElementById('noantrol').textContent = input.toUpperCase();
+socket.on("broadcast", (data) => {
+  console.log("📢 Notifikasi diterima:", data);
 
-            // Panggil suara
-            await EasySpeech.speak({
-                text: input,
-                voice: window.speechSynthesis.getVoices().find(voice => voice.lang === 'id-ID'),
-                pitch: 1,
-                rate: 0.9,
-                volume: 1,
-                boundary: e => console.debug('boundary reached')
-            });
-        }
+  if (data.message) {
+    document.getElementById("noantrol").textContent = data.message.toUpperCase();
+
+    EasySpeech.speak({
+      text: data.message,
+      voice: window.speechSynthesis.getVoices().find(v => v.lang === "id-ID"),
+      pitch: 1,
+      rate: 0.9,
+      volume: 1
+    });
+  }
+});
+
+
+
+
+  // Fungsi untuk memanggil antrian manual
+  async function panggilAntrianManual() {
+    const input = document.getElementById("manualQueue").value.trim();
+
+    if (!input) {
+      alert("Silakan masukkan nomor antrian");
+      return;
+    }
+
+    // Tampilkan nomor di UI
+    document.getElementById("noantrol").textContent = input.toUpperCase();
+
+    // Panggil suara
+    await EasySpeech.speak({
+      text: input,
+      voice: window.speechSynthesis.getVoices().find(v => v.lang === "id-ID"),
+      pitch: 1,
+      rate: 0.9,
+      volume: 1
+    });
+
+    // Kirim juga ke socket (opsional, jika ingin broadcast)
+    socket.emit("notification", { message: input });
+  }
     </script>
 </body>
 </html>
